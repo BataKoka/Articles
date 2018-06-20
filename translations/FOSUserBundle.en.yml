@@ -1,0 +1,7 @@
+# Global strings
+layout:
+    logged_in_as: '%username%'
+
+security:
+    flash:
+        success: 'You logged in successfully!'

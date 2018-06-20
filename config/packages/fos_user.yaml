@@ -5,3 +5,17 @@ fos_user:
     from_email:
         address: "lcb@mail.com"
         sender_name: "lcb group"
+
+# ovo dole je promena default fosUser validacije, dolazi iz config\validator\validation.yaml
+    profile:
+        form:
+            validation_groups:  [AcmeValidation, Profile, Default]
+    change_password:
+        form:
+            validation_groups:  [AcmeValidation, ChangePassword, Default]
+    registration:
+        form:
+            validation_groups:  [AcmeValidation, Registration, Default]
+    resetting:
+        form:
+            validation_groups:  [AcmeValidation, ResetPassword, Default]

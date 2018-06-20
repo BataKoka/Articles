@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Article{% endblock %}
+
+{% block body %}
+    <div class="form-group row">
+        <div class="col-sm-7">
+            <h1 class="h3 mb-3 font-weight-normal">Article: {{ article.title }}</h1>
+        </div>
+        <div class="col-sm-1">
+            <a href="{{ path('article_index') }}" class="btn btn-outline-info">back to list</a>
+        </div>
+    </div>
+
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Text:</th>
+                <td>{{ article.text }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    {#{{ include('comment/_form.html.twig', {'button_label': 'Post'}) }}#}
+{% endblock %}
