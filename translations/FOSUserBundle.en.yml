@@ -2,6 +2,6 @@
 layout:
     logged_in_as: '%username%'
 
-security:
-    flash:
-        success: 'You logged in successfully!'
+#security:
+#    flash:
+#        success: 'You logged in successfully!'

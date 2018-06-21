@@ -1,37 +1,42 @@
-{% extends 'base.html.twig' %}
+<br />
+<div class="form-group row">
+    <div class="col-sm-7">
+        <h1 class="h3 mb-3 font-weight-normal">Comments:</h1>
+    </div>
+</div>
 
-{% block title %}Comment index{% endblock %}
-
-{% block body %}
-    <h1>Comment index</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Content</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for comment in comments %}
-            <tr>
-                <td>{{ comment.id }}</td>
-                <td>{{ comment.name }}</td>
-                <td>{{ comment.content }}</td>
-                <td>
-                    <a href="{{ path('comment_show', {'id': comment.id}) }}">show</a>
-                    <a href="{{ path('comment_edit', {'id': comment.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('comment_new') }}">Create new</a>
-{% endblock %}
+<table id="comment_table" class="table table-hover">
+    <thead class="thead-light">
+        <tr>
+            <th>User</th>
+            <th>Name</th>
+            <th>Content</th>
+            <th class="text-center">actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for comment in comments %}
+        <tr>
+            <td>{{ comment.user.username }}</td>
+            <td>{{ comment.name }}</td>
+            <td data-text="{{ comment.content }}">
+                {{ comment.content }}
+            </td>
+            <td class="text-center">
+            {% if app.user is not null and is_granted("IS_AUTHENTICATED_REMEMBERED") and app.user.id is same as(comment.user.id) %}
+                <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                    <a href="{{ path('comment_edit', {'id': comment.id}) }}" class="btn btn-primary">Edit</a>
+                    {{ include('comment/_delete_form.html.twig') }}
+                </div>
+            {% else %}
+                N/A
+            {% endif %}
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="4">no records found</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

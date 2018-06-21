@@ -45,5 +45,7 @@ security:
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
+        - { path: ^/article/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/article/\d+$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY } # ja dodao da svako moze na /, ali SAMO na /
         - { path: ^/, role: ROLE_USER } # sve ostalo sto pocinje na / sem ovih gore zahteva login

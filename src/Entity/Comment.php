@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CommentRepository")
@@ -20,22 +21,28 @@ class Comment
     private $id;
 
     /**
+     * @Assert\NotBlank()
+     * @Assert\Length(min="3")
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $name;
 
     /**
+     * @Assert\NotBlank()
+     * @Assert\Length(min="1")
      * @ORM\Column(type="text")
      */
     private $content;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\ManyToOne(targetEntity="App\Entity\Article", inversedBy="comments")
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $article;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="comments")
      * @ORM\JoinColumn(onDelete="CASCADE")
      */

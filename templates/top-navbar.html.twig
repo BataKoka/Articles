@@ -6,12 +6,12 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarsExample07">
+
             <ul class="navbar-nav mr-auto">
-                {% if app.user is not null and is_granted("IS_AUTHENTICATED_REMEMBERED") %}
                     <li class="nav-item {% if 'article' in app.request.pathInfo %}active{% endif %}">
                         <a class="nav-link" href="{{ path('article_index') }}">Articles <span class="sr-only">(current)</span></a>
                     </li>
-
+                {% if app.user is not null and is_granted("IS_AUTHENTICATED_REMEMBERED") %}
                     <li class="nav-item {% if 'category' in app.request.pathInfo %}active{% endif %}">
                         <a class="nav-link" href="{{ path('category_index') }}">Categories</a>
                     </li>

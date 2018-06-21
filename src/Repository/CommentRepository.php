@@ -47,4 +47,14 @@ class CommentRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findAllCommentsForArticle($article)
+    {
+        return $this->createQueryBuilder('comment')
+            ->andWhere('comment.article = :value')
+            ->setParameter('value', $article)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

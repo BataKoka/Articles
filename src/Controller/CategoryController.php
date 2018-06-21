@@ -48,13 +48,6 @@ class CategoryController extends Controller
         ]);
     }
 
-//    /**
-//     * @Route("/{id}", name="category_show", methods="GET")
-//     */
-//    public function show(Category $category): Response
-//    {
-//        return $this->render('category/show.html.twig', ['category' => $category]);
-//    }
 
     /**
      * @Route("/{id}/edit", name="category_edit", methods="GET|POST")

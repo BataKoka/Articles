@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Article;
 use App\Entity\Comment;
 use App\Form\CommentType;
 use App\Repository\CommentRepository;
@@ -9,26 +10,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-/**
- * @Route("/comment")
- */
+
 class CommentController extends Controller
 {
     /**
-     * @Route("/", name="comment_index", methods="GET")
+     * @Route("/article/{articleId}/comment/new", name="comment_new", methods="GET|POST")
      */
-    public function index(CommentRepository $commentRepository): Response
-    {
-        return $this->render('comment/index.html.twig', ['comments' => $commentRepository->findAll()]);
-    }
-
-    /**
-     * @Route("/new", name="comment_new", methods="GET|POST")
-     */
-    public function new(Request $request): Response
+    public function new(Request $request, $articleId, UserInterface $user): Response
     {
         $comment = new Comment();
+        $article = $this->getDoctrine()
+            ->getRepository(Article::class)
+            ->find($articleId);
+        $comment->setArticle($article);
+        $comment->setUser($user);
+
         $form = $this->createForm(CommentType::class, $comment);
         $form->handleRequest($request);
 
@@ -37,33 +36,34 @@ class CommentController extends Controller
             $em->persist($comment);
             $em->flush();
 
-            return $this->redirectToRoute('comment_index');
+            $this->addFlash('success', '<strong>Success!</strong> Item has been added successfully');
+
+            return $this->redirectToRoute('article_show', ['id' => $articleId]);
         }
 
         return $this->render('comment/new.html.twig', [
             'comment' => $comment,
+            'articleId' => $articleId,
             'form' => $form->createView(),
         ]);
     }
 
     /**
-     * @Route("/{id}", name="comment_show", methods="GET")
+     * @Route("/comment/{id}/edit", name="comment_edit", methods="GET|POST")
      */
-    public function show(Comment $comment): Response
+    public function edit(Request $request, Comment $comment, UserInterface $user): Response
     {
-        return $this->render('comment/show.html.twig', ['comment' => $comment]);
-    }
+        if ( $request->isMethod('get') && $comment->getUser() !== $user ) {
+            throw new AccessDeniedException('Unable to access this page!');
+        }
 
-    /**
-     * @Route("/{id}/edit", name="comment_edit", methods="GET|POST")
-     */
-    public function edit(Request $request, Comment $comment): Response
-    {
         $form = $this->createForm(CommentType::class, $comment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
+
+            $this->addFlash('success', '<strong>Success!</strong> Item has been edited successfully');
 
             return $this->redirectToRoute('comment_edit', ['id' => $comment->getId()]);
         }
@@ -71,20 +71,27 @@ class CommentController extends Controller
         return $this->render('comment/edit.html.twig', [
             'comment' => $comment,
             'form' => $form->createView(),
+            'articleId' => $comment->getArticle()->getId(),
         ]);
     }
 
     /**
-     * @Route("/{id}", name="comment_delete", methods="DELETE")
+     * @Route("/comment/{id}", name="comment_delete", methods="DELETE")
      */
-    public function delete(Request $request, Comment $comment): Response
+    public function delete(Request $request, Comment $comment, UserInterface $user): Response
     {
+        if ( $comment->getUser() !== $user ) {
+            throw new AccessDeniedException('Unable to access this page!');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$comment->getId(), $request->request->get('_token'))) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($comment);
             $em->flush();
+
+            $this->addFlash('success', '<strong>Success!</strong> Item has been deleted successfully');
         }
 
-        return $this->redirectToRoute('comment_index');
+        return $this->redirectToRoute('article_show', ['id' => $comment->getArticle()->getId()]);
     }
 }

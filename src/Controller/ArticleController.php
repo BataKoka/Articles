@@ -5,10 +5,13 @@ namespace App\Controller;
 use App\Entity\Article;
 use App\Form\ArticleType;
 use App\Repository\ArticleRepository;
+use App\Repository\CommentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/article")
@@ -26,9 +29,11 @@ class ArticleController extends Controller
     /**
      * @Route("/new", name="article_new", methods="GET|POST")
      */
-    public function new(Request $request): Response
+    public function new(Request $request, UserInterface $user): Response
     {
         $article = new Article();
+        $article->setUser($user);
+
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
 
@@ -51,19 +56,26 @@ class ArticleController extends Controller
     /**
      * @Route("/{id}", name="article_show", methods="GET")
      */
-    public function show(Article $article): Response
+    public function show(Article $article, CommentRepository $commentRepository): Response
     {
-        return $this->render('article/show.html.twig', ['article' => $article]);
+        return $this->render('article/show.html.twig', [
+            'article' => $article,
+            'comments' => $commentRepository->findAllCommentsForArticle($article),
+        ]);
     }
 
     /**
      * @Route("/{id}/edit", name="article_edit", methods="GET|POST")
      */
-    public function edit(Request $request, Article $article): Response
+    public function edit(Request $request, Article $article, UserInterface $user): Response
     {
-//        if ( $request->isMethod('get') && $article->getUser()->getId() !== $loggeduserId ) {
-//            throw new \Exception('403');
+//        if ($user === $article->getUser()) {
+//            echo 'dap, IDENTICNI su!';
 //        }
+
+        if ( $request->isMethod('get') && $article->getUser() !== $user ) {
+            throw new AccessDeniedException('Unable to access this page!');
+        }
 
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
@@ -85,11 +97,11 @@ class ArticleController extends Controller
     /**
      * @Route("/{id}", name="article_delete", methods="DELETE")
      */
-    public function delete(Request $request, Article $article): Response
+    public function delete(Request $request, Article $article, UserInterface $user): Response
     {
-//        if ( $article->getUser()->getId() !== $loggeduserId ) {
-//            throw new \Exception('403');
-//        }
+        if ( $article->getUser() !== $user ) {
+            throw new AccessDeniedException('Unable to access this page!');
+        }
 
         if ($this->isCsrfTokenValid('delete'.$article->getId(), $request->request->get('_token'))) {
             $em = $this->getDoctrine()->getManager();

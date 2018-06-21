@@ -23,6 +23,7 @@ class ArticleType extends AbstractType
                 'choice_label' => 'title',
                 'placeholder' => '',
             ])
+            ->remove('user')
         ;
     }
 

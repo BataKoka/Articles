@@ -22,5 +22,11 @@
         </tbody>
     </table>
 
-    {#{{ include('comment/_form.html.twig', {'button_label': 'Post'}) }}#}
+    {% if app.user is not null and is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+        <div class="col-sm-1">
+            <a href="{{ path('comment_new', {'articleId': article.id}) }}" class="btn btn-success">Write a comment</a>
+        </div>
+    {% endif %}
+
+    {{ include('@root/comment/index.html.twig') }}
 {% endblock %}
